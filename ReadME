@@ -1,0 +1,36 @@
+Чтобы всё правильно установилось необходимо использовать VPN(по крайней мере у меня без него установить не получилось)
+
+//установить и настроить менеджер пакетов opam
+sudo apt install opam
+opam init
+opam switch create 4.14.1
+eval$(opam env)
+
+//установить frama-c
+opam install frama-c
+
+
+//установить  SMT-решатели и coq 
+opam install alt-ergo
+opam install why3
+opam install cvc5
+opam install coq.8.16.1 coqide.8.16.1
+
+//прикрутить SMT-решатели и coq к frama-c
+eval$(opam env)
+opam reinstall why3
+opam install why3-coq
+why3 config detect
+frama-c -wp-detect
+
+
+
+
+//запуск через терминал
+//запустить frama-c ide(просто посмотреть что доказалось, а что нет)(запускать нужно из папки, в которой лежит файл gemm_v0.c)
+frama-c-gui -wp -wp-prover z3,cvc5,cvc4,alt-ergo -wp-model "Typed+var+nat+real" gemm_v0.c
+
+//запустить coqide(он выдаст цели которые не смогли доказать автоматически SMT-решатели) //так же после -wp-session
+необходимо указать путь к папке где сохранять доказанные теоремы coq (запускать нужно из папки, в которой лежит файл gemm_v0.c)
+ 
+frama-c -wp -wp-interactive "fix" -wp-prover z3,cvc5,cvc4,alt-ergo,Coq -wp-model "Typed+var+nat+real" -wp-session /home/CoqFIlesGemmV0 gemm_v0.c
