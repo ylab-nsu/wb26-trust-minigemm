@@ -1,0 +1,182 @@
+Require Import Psatz.
+From Hammer Require Import Hammer.
+From Tactician Require Import Ltac1.
+Require Import Coq.Logic.FunctionalExtensionality.
+Set Hammer ATPLimit 60.
+Proof.
+intros.
+apply Q_rowresult_step.
+-lia.
+-replace (- (1) + (1 + i4))%Z with i4 by lia.
+assert (Hframe: forall k, (k <= i4)%Z -> 
+            P_RowResult a7 t1 a a1 a2 k i3 i i2 -> 
+            P_RowResult (map.Map.set a7 a8 r) t1 a a1 a2 k i3 i i2).
++intros.
+induction H28.
+--apply Q_rowresult_empty. 
+lia.
+--apply Q_rowresult_step.
+++lia.
+++apply IHP_RowResult; try assumption.
+lia.
+++unfold map.Map.set.
+destruct (why_decidable_eq a8 (shift C (- (1) + to + N * i))) as[Heq | Hneq].
+assert (H_off: offset a8 = offset (shift C (- (1) + to + N * i)%Z)).
+---rewrite Heq.
+reflexivity.
+--- unfold a8, shift, offset, x3 in H_off.
+lia.
+---exact H30.
++apply Hframe; try assumption.
+lia.
+-replace  (- (1) + (1 + i4))%Z with i4 by lia .
+replace i with i5 by lia.
+replace i with i5 in H26 by lia.
+assert (H_read: map.Map.set a7 a8 r (shift a2 (i4 + i2 * i3)%Z) = r).
++unfold a8, x3. 
+unfold Map.set.
+destruct (why_decidable_eq (shift a2 (i4 + i2 * i3))
+    (shift a2 (i4 + i2 * i3))) as [Heq | Hneq].
+--reflexivity.
+--hammer.
++rewrite H_read.
+(*-------------------------------------------*)
+assert (Hframe: forall k res, (k <= i)%Z ->
+    P_DotProduction a9 a a1 k i3 i i4 i2 res -> 
+    P_DotProduction t1 a a1 k i3 i i4 i2 res).
+--
+
+intros k res_ Hk Hdot.
+remember a9 as Mf32.
+induction Hdot.
+++apply Q_dotproduction_empty_range.
+lia.
+++subst Mf32.
+
+(**)
+ assert (EqA: a9 (shift A (- (1) + to + K * i)%Z) = 
+t1 (shift A (- (1) + to + K * i)%Z)).
+---replace ((- (1) + to))%Z with x0 by lia.
+unfold a9.
+unfold Map.set.
+destruct (why_decidable_eq a8 (shift A (x0 + K * i)%Z)) as [Heq | Hneq].
+
++++ unfold a8, a4, a5, separated, shift, base, offset in *.
+inversion Heq.
+
+destruct H19 as [H_bad1 | [H_bad2 | [H_bad3 | [H_bad4 | H_bad5]]]].
+unfold x1 in H_bad1. nia.
+unfold x2 in H_bad2. nia.
+rewrite H29 in H_bad3. congruence.
+unfold x2 in H_bad4. nia.
+unfold x1 in H_bad5. nia.
++++unfold a7.
+destruct (havoc_access t2 a6 (shift A (x0 + K * i)%Z) (shift a2 x3) N) as [Hacc7 _].
+rewrite Hacc7.
+destruct A, a2.
+unfold a4, a5, separated, shift, base, offset in *.
+destruct H19 as [H_bad1 | [H_bad2 | [H_bad3 | [H_bad4 | H_bad5]]]].
+nia. nia.
+----unfold a6.
+destruct (havoc_access t3 t1 (addr'mk z (z0 + (x0 + K * i)%Z)) (addr'mk z1 (z2 + 0)%Z) x2) as[Hacc6 _].
+ rewrite Hacc6.
+reflexivity.
+unfold separated, base, offset.
+right. right. left.
+exact H_bad3.
+----unfold a6.
+destruct (havoc_access t3 t1 (addr'mk z (z0 + (x0 + K * i)%Z)) (addr'mk z1 (z2 + 0)%Z) x2) as[Hacc6 _].
+ rewrite Hacc6.
+reflexivity.
+unfold separated, base, offset.
+right. right. right. left.
+nia.
+
+
+
+----unfold a6.
+destruct (havoc_access t3 t1 (addr'mk z (z0 + (x0 + K * i)%Z)) (addr'mk z1 (z2 + 0)%Z) x2) as[Hacc6 _].
+ rewrite Hacc6.
+reflexivity.
+unfold separated, base, offset.
+nia.
+
+----
+unfold a6.
+destruct (havoc_access t3 t1 (shift A (x0 + K * i)%Z) a5 x2) as [Hacc6 _].
+destruct A, a2.
+unfold a4, a5, separated, shift, base, offset, x1, x2, x3, x0, x in *.
+destruct H19 as [H_bad1 | [H_bad2 | [H_bad3 | [H_bad4 | H_bad5]]]].
+nia. nia. nia. nia. nia.
+
+---assert (EqB: a9 (shift B (j + N * x0)%Z) = 
+t1 (shift B (j + N * x0)%Z)).
+
++++unfold a9.
+unfold Map.set.
+destruct (why_decidable_eq a8 (shift B (j + N * x0)%Z)) as [Heq | Hneq].
+++++
+destruct B, a2.
+unfold a8, a3, a5, separated, shift, base, offset, x, x2, x3, x0 in *.
+inversion Heq.
+ destruct H18 as [H_bad1 | [H_bad2 | [H_bad3 | [H_bad4 | H_bad5]]]].
+nia. nia. congruence.
+assert (H_clean: (z2 + (j + N * i))%Z = (z0 + (j + N * (- (1) + to)))%Z).
+inversion Heq. sfirstorder. nia.
+assert (H_clean: (z2 + (j + N * i))%Z = (z0 + (j + N * (- (1) + to)))%Z).
+inversion Heq. sfirstorder. nia.
+
+
+
+++++
+unfold a7.
+destruct (havoc_access t2 a6 (shift B (j + N * x0)%Z) (shift a2 x3) N) as [Hacc7 _].
+rewrite Hacc7.
+----
+destruct B, a2.
+unfold a3, a5, separated, shift, base, offset, x, x2, x3, x0 in *.
+ assert (H18_copy := H18).
+          destruct H18_copy as [H_bad1 | [H_bad2 | [H_bad3 | [H_bad4 | H_bad5]]]].
+nia. nia.
+unfold a6.
+destruct (havoc_access t3 t1 (addr'mk z (z0 + (j + N * (- (1) + to)))) (addr'mk z1 (z2 + 0)) (i1 * N)) as [Hacc6 _].
+apply Hacc6.
+unfold separated, base, offset, shift in *.
+nia. 
+
+unfold a6.
+destruct (havoc_access t3 t1 (addr'mk z (z0 + (j + N * (- (1) + to)))) (addr'mk z1 (z2 + 0)) (i1 * N)) as [Hacc6 _].
+apply Hacc6.
+unfold separated, base, offset, shift in *.
+nia.
+
+unfold a6.
+destruct (havoc_access t3 t1 (addr'mk z (z0 + (j + N * (- (1) + to)))) (addr'mk z1 (z2 + 0)) (i1 * N)) as [Hacc6 _].
+apply Hacc6.
+unfold separated, base, offset, shift in *.
+nia. 
+
+----
+unfold a6.
+      destruct (havoc_access t1 t3 a5 (shift B (j + N * x0)%Z) x2) as [Hacc6 _].
+      destruct B, a2.
+unfold a3, a5, separated, shift, base, offset, x, x2, x3, x0 in *.
+assert (H18_copy := H18).
+          destruct H18_copy as [H_bad1 | [H_bad2 | [H_bad3 | [H_bad4 | H_bad5]]]].
+nia. nia. nia. nia. nia.
+
++++
+rewrite EqA.
+rewrite EqB.
+apply Q_dotproduction_positive_range. lia.
+replace (- (1) + to)%Z with x0 by lia.
+apply IHHdot; try assumption. sauto. nia.
+--replace i5 with i by lia.
+apply Hframe; try assumption. lia.
+replace i with i5 by lia.
+exact H26.
+
+
+
+Qed.
+

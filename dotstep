@@ -1,0 +1,8 @@
+Require Import Lia.
+Proof.
+intros.
+replace (i5 + i * i3)%Z with (-1 + (1 + i5) + i * i3)%Z by lia.
+replace (i4 + i2 * i5)%Z with (i4 + i2 * (-1 + (1 + i5)))%Z by lia.
+apply Q_dotproduction_positive_range.
+-lia.
+-replace (- (1) + (1 + i5))%Z with i5 by lia. exact H26.

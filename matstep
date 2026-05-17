@@ -1,0 +1,40 @@
+Require Import Psatz.
+From Hammer Require Import Hammer.
+Proof.
+intros.
+apply Q_matrixresult_step.
+-lia.
+-replace i2 with i4 by lia.
+replace i2 with i4 in H21 by lia.
+replace  (- (1) + (1 + i3))%Z with i3 by lia.
+exact H21.
+-replace  (- (1) + (1 + i3))%Z with i3 by lia.
+assert (Hframe_row: forall r_i r_to, (r_i < i3)%Z -> (r_to <= i2)%Z ->
+    P_RowResult a6 t1 a a1 a2 r_to r_i i i2 ->
+    P_RowResult a7 t1 a a1 a2 r_to r_i i i2).
+intros r_i r_to Hri Hrto Hrow. induction Hrow.
++ apply Q_rowresult_empty. lia.
++ apply Q_rowresult_step. lia.
+--apply IHHrow; try assumption. lia.
+-- replace (- (1) + to)%Z with (to - 1)%Z by lia.
+assert (EqC: a7 (shift C (to - 1 + N * i)%Z) = Mf32 (shift C (to - 1 + N * i)%Z)).
+unfold a7.
+++ destruct (havoc_access t2 Mf32 (shift C (to - 1 + N * i)%Z) (shift C (N * i3)%Z) N) as [Hacc _].
+apply Hacc.
+unfold separated, shift, base, offset in *.
+nia.
+++ rewrite EqC. replace (to-1)%Z with x0 by lia.
+replace (- (1) + to)%Z with x0 in H23 by lia.
+exact H23.
++assert (Hframe_mat: forall k, (k <= i3)%Z ->
+    P_MatrixResult a6 t1 a a1 a2 k i i2 i1 ->
+    P_MatrixResult a7 t1 a a1 a2 k i i2 i1).
+  intros k Hk Hmat. induction Hmat.
+++ apply Q_matrixresult_empty. lia.
+++ apply Q_matrixresult_step. lia.
+-- apply Hframe_row. lia. lia.
+replace (- (1) +to)%Z with x0 by lia.
+exact H23.
+--replace (- (1) +to)%Z with x0 by lia.
+apply IHHmat; try assumption. lia.
+++apply Hframe_mat; try assumption. lia.
