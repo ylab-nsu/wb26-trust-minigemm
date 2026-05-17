@@ -1,0 +1,107 @@
+intros.
+ assert (EqA: forall idx, (0 <= idx)%Z -> (idx < i * i1)%Z -> a13 (shift a idx) = a9 (shift a idx)).
+  {
+    intros idx Hidx_min Hidx_max. unfold a13, a11, Map.set.
+    destruct (why_decidable_eq (shift a2 (i7 + x3)%Z) (shift a idx)) as [Heq | Hneq].
+    - (* Вскрываем базу И СМЕЩЕНИЕ (HeqOff)! *)
+      unfold shift, base, offset, a4, a5, x1, x2 in *. 
+      injection Heq as HeqBase HeqOff.
+      (* Разбираем гипотезу H25 (A и C разделены) *)
+      destruct H25 as[Hb1|[Hb2|[Hb3|[Hb4|Hb5]]]].
+      * nia.
+      * nia.
+      * unfold base, shift in Hb3.
+        unfold base in Hb3.
+        congruence.
+      * (* Подсказка: конец изменяемой строки C не выходит за пределы матрицы C *)
+        assert (Step: (i7 + i2 * i3 < i1 * i2)%Z) by nia.
+         destruct a2 as[b_a2 o_a2]. destruct a as [b_a o_a].
+        unfold shift, offset, base in *. simpl in *.
+      nia. 
+        
+      *  destruct a2 as [b_a2 o_a2]. destruct a as [b_a o_a].
+        unfold shift, offset, base in *. simpl in *. 
+        nia.
+    - reflexivity.
+  }
+ assert (EqB: forall idx, (0 <= idx)%Z -> (idx < i * i2)%Z -> a13 (shift a1 idx) = a9 (shift a1 idx)).
+  {
+    intros idx Hidx_min Hidx_max. 
+    unfold a13, a11, Map.set.
+    destruct (why_decidable_eq (shift a2 (i7 + x3)%Z) (shift a1 idx)) as[Heq | Hneq].
+    - 
+      unfold shift, base, offset, a3, a5, x, x2, x3 in *. 
+      injection Heq as HeqBase HeqOff.
+      
+      (* Разбираем гипотезу H24 (B и C разделены) *)
+      destruct H24 as [Hb1|[Hb2|[Hb3|[Hb4|Hb5]]]].
+      * nia.
+      * nia.
+            * assert (Step: (i7 + i2 * i3 < i1 * i2)%Z) by nia.
+         destruct a2 as[b_a2 o_a2]. destruct a1 as [b_a o_a].
+        unfold shift, offset, base, x3 in *. simpl in *. nia. 
+      * (* Ветка 4: C ДО B *)
+        assert (Step: (i7 + i2 * i3 < i1 * i2)%Z) by nia.
+        destruct a2 as [b_a2 o_a2]. destruct a1 as [b_a1 o_a1].
+        simpl in *. 
+        (* Теперь nia видит Hidx_min (0 <= idx), HeqOff и Step. Это победа! *)
+        nia.
+      * (* Ветка 5: B ДО C *)
+        destruct a2 as [b_a2 o_a2]. destruct a1 as [b_a1 o_a1].
+        simpl in *. 
+        (* Теперь nia видит Hidx_max (idx < i * i2) и HeqOff. Это тоже победа! *)
+        nia.
+    - reflexivity.
+  }
+ assert (Hframe_dot: forall k_dot col res_, 
+      (k_dot <= i)%Z -> (col < i2)%Z -> (0 <= col)%Z -> 
+      P_DotProduction a9 a a1 k_dot i3 i col i2 res_ -> 
+      P_DotProduction a13 a a1 k_dot i3 i col i2 res_).
+  {
+    intros k_dot col res_ Hk_max Hcol_min Hcol_max Hdot_k.
+    
+    (* Делаем индукцию. Переменная 'to' будет означать текущую длину *)
+    induction Hdot_k as [to_empty Hempty | to_pos Hpos Hdot_prev IH].
+    - apply Q_dotproduction_empty_range. lia.
+    - (* МАГИЯ: Заменяем новую память на старую. 
+         nia видит Hcol_max (col < i2) и Hk_max (to_pos <= i) и легко докажет границы! *)
+      rewrite <- EqA; [ | lia | nia ].
+      rewrite <- EqB.
+      
+      apply Q_dotproduction_positive_range.
+      + lia.
+      + apply IHHdot_k; try assumption. nia.
+      + nia. +nia.
+  }
+
+  assert (H_cases: (i4 < i7 \/ i4 = i7)%Z) by lia.
+  destruct H_cases as [H_lt | H_eq].
+-
+  assert (EqC: a13 (shift a2 (i4 + x3)%Z) = a9 (shift a2 (i4 + x3)%Z)).
+    {
+      unfold a13, a11, Map.set.
+      destruct (why_decidable_eq (shift a2 (i7 + x3)%Z) (shift a2 (i4 + x3)%Z)) as[Heq | Hneq].
+      * unfold shift, offset in Heq. injection Heq. 
+        lia. (* nia понимает, что i7 не может быть равно i4 *)
+      * reflexivity.
+    }
+rewrite EqC.
+apply Hframe_dot.
+lia. nia. nia.
+apply H36.
+nia. nia.
+-rewrite H_eq.
+ assert (EqC_new: a13 (shift a2 (i7 + x3)%Z) = a12).
+    {
+      unfold a13, a11, Map.set.
+      destruct (why_decidable_eq (shift a2 (i7 + x3)%Z) (shift a2 (i7 + x3)%Z)) as[Heq | Hneq].
+      * reflexivity.
+      * congruence. (* Абсурд, адрес всегда равен самому себе *)
+    }
+rewrite EqC_new.
+replace i7 with i4 by H_eq.
+apply Hframe_dot.
+lia.
+rewrite H_eq. nia. nia.
+replace i4 with i7 by H_eq.
+exact H32.
